@@ -90,11 +90,11 @@ router.get('/', async (req, res) => {
 
 /**
  * POST /api/leads
- * Create a new lead
+ * Create a new lead and automatically score it with Grok AI
  */
 router.post('/', async (req, res) => {
   const startTime = Date.now()
-  logger.info('POST /api/leads - Creating lead', { 
+  logger.info('POST /api/leads - Creating lead with AI scoring', { 
     bodySize: JSON.stringify(req.body).length,
     userAgent: req.get('User-Agent')
   })
@@ -103,18 +103,59 @@ router.post('/', async (req, res) => {
     // Validate request body
     const data = CreateLeadSchema.parse(req.body)
     
-    // Create lead using service
+    // Create lead using service (without score initially)
     const { leadService } = getServices()
-    const lead = await leadService.createLead(data)
+    const lead = await leadService.createLead({
+      ...data,
+      score: 0, // Start with no score
+      scoreBreakdown: null // Will be filled by AI
+    })
+    
+    logger.info('Lead created, now scoring with Grok AI', { 
+      leadId: lead.id,
+      leadName: lead.fullName
+    })
+
+    // Automatically score the new lead with Grok AI
+    try {
+      const { ScoringService } = await import('../services/scoringService.js')
+      const scoringService = new ScoringService(prisma)
+      
+      // Get the first scoring profile
+      const profiles = await prisma.scoringProfile.findMany({ take: 1 })
+      if (profiles.length > 0) {
+        const scoringResult = await scoringService.scoreLead({
+          leadId: lead.id,
+          profileId: profiles[0].id,
+          forceRescore: true // Always use Grok AI for new leads
+        })
+        
+        logger.info('New lead scored with Grok AI', {
+          leadId: lead.id,
+          leadName: lead.fullName,
+          aiScore: scoringResult.score,
+          aiRationale: scoringResult.rationale
+        })
+      }
+    } catch (scoringError) {
+      logger.warn('Failed to auto-score new lead, but lead was created', {
+        leadId: lead.id,
+        scoringError: scoringError instanceof Error ? scoringError.message : 'Unknown error'
+      })
+    }
+
+    // Fetch the updated lead with AI score
+    const updatedLead = await leadService.getLeadById(lead.id)
     
     const duration = Date.now() - startTime
-    logger.info('POST /api/leads - Success', { 
-      leadId: lead.id,
-      leadName: lead.fullName,
+    logger.info('POST /api/leads - Success with AI scoring', { 
+      leadId: updatedLead.id,
+      leadName: updatedLead.fullName,
+      finalScore: updatedLead.score,
       duration: `${duration}ms`
     })
 
-    res.status(201).json(lead)
+    res.status(201).json(updatedLead)
   } catch (error) {
     const duration = Date.now() - startTime
     

@@ -53,8 +53,8 @@ export function MetricsGrid() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {[...Array(4)].map((_, i) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[...Array(3)].map((_, i) => (
           <div key={i} className="bg-white rounded-lg shadow p-6 animate-pulse">
             <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
             <div className="h-8 bg-gray-200 rounded w-16 mb-2"></div>
@@ -94,18 +94,11 @@ export function MetricsGrid() {
       icon: TrendingUp,
       change: '8 leads in progress',
       changeType: 'neutral' as const
-    },
-    {
-      title: 'Avg Response Time',
-      value: '2.4 days',
-      icon: Clock,
-      change: '-0.8 days from last month',
-      changeType: 'positive' as const
     }
   ]
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {metrics.map((metric) => (
         <MetricCard key={metric.title} {...metric} />
       ))}
