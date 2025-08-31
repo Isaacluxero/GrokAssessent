@@ -1,73 +1,213 @@
-# SDR Grok Demo
+# SDR Grok - AI-Powered Sales Development Platform
 
-An AI-powered SDR demo that uses Grok as the core intelligence layer to: (1) qualify and score inbound/outbound leads, (2) generate personalized outreach with guardrails + validation, and (3) track pipeline progress with searchable history. Includes a lightweight eval framework to iterate prompts + recommend improvements.
+A production-ready SDR automation platform that leverages Grok AI for intelligent lead qualification, scoring, and personalized outreach generation. Built with modern TypeScript, comprehensive error handling, and enterprise-grade evaluation frameworks.
+
+## Overview
+
+SDR Grok transforms sales development workflows by providing:
+
+### 🎯 **Core Capabilities**
+- **Intelligent Lead Scoring**: Grok AI analyzes leads across multiple dimensions (industry fit, company size, title relevance, tech signals) to generate qualification scores
+- **Personalized Outreach Generation**: AI-powered email creation with safety validation, PII detection, and hallucination prevention
+- **Pipeline Management**: Visual kanban board with automated stage tracking and interaction logging
+- **Performance Evaluation**: Comprehensive AI evaluation framework with uniform metrics for prompt optimization
+
+### 🏗️ **Architecture**
+- **Service-Oriented Design**: Modular services with clear separation of concerns
+- **AI-First Approach**: Grok AI integration with fallback handling and error recovery
+- **Type-Safe APIs**: Full TypeScript coverage with Zod validation schemas
+- **Production Ready**: Comprehensive logging, monitoring, and deployment considerations
 
 ## Quick Start
 
-1. Set up environment variables:
+### Prerequisites
+- Node.js 18+ 
+- Docker & Docker Compose
+- PostgreSQL (via Docker or local installation)
+- Grok AI API key from X.AI
+
+### Installation
+
+1. **Clone and setup environment:**
 ```bash
+git clone <repository-url>
+cd sdr-grok
 cp .env.example .env
-# Edit .env with your GROK_API_KEY and other values
+# Edit .env with your GROK_API_KEY and database credentials
 ```
 
-2. Start the database:
+2. **Start the application:**
+```bash
+./startup.sh
+```
+
+This will:
+- Start PostgreSQL database container
+- Run database migrations and seeding
+- Install all dependencies
+- Start backend API server (port 8080)
+- Start frontend application (port 3000)
+
+### Manual Setup (Alternative)
+
+1. **Database setup:**
 ```bash
 docker compose up -d db
-```
-
-3. Set up the database:
-```bash
 ./scripts/setup-db.sh
 ```
 
-4. Start both applications:
+2. **Backend setup:**
 ```bash
+cd backend
+npm install
+npx prisma migrate dev
+npx prisma db seed
+npm run dev
+```
+
+3. **Frontend setup:**
+```bash
+cd frontend
+npm install
 npm run dev
 ```
 
 ## Tech Stack
 
-- **Frontend**: Next.js (App Router), React, TypeScript, TailwindCSS, shadcn/ui, TanStack Query
-- **Backend**: Node.js, Express, TypeScript, Prisma (Postgres), Grok API
-- **AI**: Grok API with structured outputs and validation
-- **Evaluation**: YAML/JSONL test cases with LLM grading
+### Frontend
+- **Framework**: Next.js 14 with App Router
+- **Language**: TypeScript with strict type checking
+- **Styling**: TailwindCSS with shadcn/ui components
+- **State Management**: TanStack Query for server state
+- **Form Handling**: Zod for validation and type safety
+- **Icons**: Lucide React for consistent iconography
+
+### Backend
+- **Runtime**: Node.js with Express.js framework
+- **Language**: TypeScript with comprehensive type definitions
+- **Database**: PostgreSQL with Prisma ORM
+- **AI Integration**: Grok API with structured output parsing
+- **Logging**: Pino for structured logging with configurable outputs
+- **Validation**: Zod schemas for request/response validation
+- **Documentation**: OpenAPI/Swagger integration
+
+### Infrastructure
+- **Containerization**: Docker with multi-stage builds
+- **Database**: PostgreSQL with connection pooling
+- **Development**: Hot reload with tsx and Next.js dev server
+- **Production**: Optimized builds with environment-specific configurations
 
 ## Project Structure
 
 ```
 sdr-grok/
-├── frontend/          # Next.js React application
-├── backend/           # Express + TypeScript API
-├── scripts/           # Database setup and evaluation scripts
-└── docker-compose.yml # Local development environment
+├── frontend/                 # Next.js React application
+│   ├── app/                 # App Router pages and layouts
+│   │   ├── page.tsx         # Dashboard (main page)
+│   │   ├── leads/           # Lead management pages
+│   │   └── evals/           # Evaluation framework pages
+│   ├── components/          # Reusable React components
+│   │   ├── ui/              # Base UI components (Button, etc.)
+│   │   └── *.tsx            # Feature-specific components
+│   ├── lib/                 # Utilities and API client
+│   │   ├── api.ts           # TanStack Query hooks and API calls
+│   │   ├── types.ts         # TypeScript type definitions
+│   │   └── utils.ts         # Helper functions
+│   └── public/              # Static assets
+├── backend/                 # Express + TypeScript API
+│   ├── src/
+│   │   ├── routes/          # API route handlers
+│   │   │   ├── leads.ts     # Lead CRUD operations
+│   │   │   ├── scoring.ts   # AI scoring endpoints
+│   │   │   ├── outreach.ts  # Email generation endpoints
+│   │   │   └── evals.ts     # Evaluation framework endpoints
+│   │   ├── services/        # Business logic layer
+│   │   │   ├── grokClient.ts    # Grok AI API client
+│   │   │   ├── leadService.ts   # Lead management logic
+│   │   │   ├── scoringService.ts # AI scoring logic
+│   │   │   ├── outreachService.ts # Email generation logic
+│   │   │   └── evalService.ts   # Evaluation framework logic
+│   │   ├── validators/      # Zod validation schemas
+│   │   ├── utils/           # Utilities (logging, etc.)
+│   │   ├── prompts/         # AI prompt templates
+│   │   └── prisma/          # Database schema and seeds
+│   ├── prisma/
+│   │   ├── schema.prisma    # Database schema definition
+│   │   └── migrations/      # Database migration files
+│   └── Dockerfile           # Container configuration
+├── scripts/                 # Automation and setup scripts
+├── docker-compose.yml       # Local development environment
+├── startup.sh              # One-command startup script
+└── .gitignore              # Git ignore patterns
 ```
 
-## Demo Script (5 min)
+## Core Features
 
-1. **Dashboard**: Show funnel + last replies
-2. **Scoring**: Open a lead, hit "Rescore" with different weights → watch score change
-3. **Personalized Outreach**: Generate preview → validate → safety badge → "Send" (mock)
-4. **Pipeline**: Move card to MEETING_SCHEDULED; timeline shows interactions
-5. **Evals**: Run evals → show pass rate + recommendations for prompt iteration
+### 1. Lead Management
+- **CRUD Operations**: Full lead lifecycle management with company association
+- **Automatic AI Scoring**: New leads are automatically scored by Grok AI upon creation
+- **Pipeline Tracking**: Visual kanban board with drag-and-drop functionality
+- **Search & Filtering**: Full-text search across leads, companies, and metadata
 
-## API Endpoints
+### 2. AI-Powered Scoring
+- **Multi-Factor Analysis**: Industry fit, company size, title relevance, tech signals
+- **Configurable Profiles**: Customizable scoring weights and business rules
+- **Real-Time Evaluation**: Instant scoring with detailed factor breakdown
+- **Score Validation**: Automatic reasonableness checks and confidence scoring
 
-- `GET /health` - Health check
-- `GET/POST /leads` - Lead management
-- `POST /leads/:id/score` - Score leads with AI
-- `POST /outreach/preview` - Generate personalized outreach
-- `POST /outreach/send` - Send outreach (mock)
-- `POST /evals/run` - Run evaluation cases
+### 3. Personalized Outreach
+- **Template-Based Generation**: AI enhancement of structured email templates
+- **Variable Substitution**: Dynamic personalization with lead and company data
+- **Safety Validation**: PII detection and hallucination risk assessment
+- **Preview & Send**: Review generated emails before sending
 
-## Environment Variables
+### 4. Evaluation Framework
+- **Uniform Metrics**: Consistent evaluation criteria across all AI operations
+- **Performance Tracking**: Monitor AI response quality, consistency, and reliability
+- **Batch Processing**: Evaluate multiple leads simultaneously
+- **Actionable Insights**: Specific recommendations for prompt and system improvements
 
+## API Reference
+
+### Lead Management
 ```bash
-DATABASE_URL=postgresql://isaaclucero@localhost:5432/sdr_grok_db
-GROK_API_KEY=your_grok_api_key_here
-GROK_MODEL=grok-4-0709
-GROK_BASE_URL=https://api.x.ai/v1
-HOST=http://localhost:3000
-PORT=8080
+GET    /api/leads              # List leads with pagination and filtering
+POST   /api/leads              # Create new lead (auto-scored with AI)
+GET    /api/leads/:id          # Get lead details
+PUT    /api/leads/:id          # Update lead information
+DELETE /api/leads/:id          # Delete lead and associated data
+```
+
+### AI Scoring
+```bash
+POST   /api/scoring/score      # Score lead with Grok AI
+GET    /api/scoring/profiles   # List scoring profiles
+POST   /api/scoring/profiles   # Create scoring profile
+GET    /api/scoring/health     # Scoring service health check
+```
+
+### Outreach Generation
+```bash
+POST   /api/outreach/preview   # Generate email preview with AI
+POST   /api/outreach/send      # Send personalized email
+GET    /api/outreach/templates # List email templates
+POST   /api/outreach/templates # Create email template
+```
+
+### Evaluation Framework
+```bash
+POST   /api/evals/batch        # Run batch evaluation on real leads
+GET    /api/evals/runs         # List evaluation results
+GET    /api/evals/cases        # List test cases
+GET    /api/evals/health       # Evaluation service health check
+```
+
+### System Health
+```bash
+GET    /health                 # Overall application health
+GET    /api/leads/health       # Lead service status
+GET    /api/scoring/health     # Scoring service status
+GET    /api/evals/health       # Evaluation service status
 ```
 
 ## Deployment Considerations
@@ -176,3 +316,51 @@ GET /api/evals/health/status   # Evaluation service health
 - **Database**: Right-size instances based on actual usage
 - **Compute**: Use auto-scaling to match demand
 - **Storage**: Implement log rotation and data archival policies
+
+## Troubleshooting
+
+### Common Issues
+
+#### White Page / UI Not Loading
+- **Check browser console** for JavaScript errors
+- **Verify backend is running** on port 8080
+- **Check network tab** for failed API calls
+- **Restart services**: `./startup.sh`
+
+#### Grok AI Scoring Failures
+- **Verify API key** is set in environment variables
+- **Check API quotas** and rate limits
+- **Review backend logs** for detailed error messages
+- **Test API directly**: `curl -X POST http://localhost:8080/api/scoring/score`
+
+#### Database Connection Issues
+- **Ensure PostgreSQL is running**: `docker compose ps`
+- **Check DATABASE_URL** format and credentials
+- **Verify database exists**: `psql -d sdr_grok_db -c "\dt"`
+- **Reset database**: `npx prisma migrate reset --force`
+
+#### Performance Issues
+- **Monitor Grok API response times** (should be <10s)
+- **Check database query performance** via logs
+- **Review memory usage** of Node.js processes
+- **Optimize database indexes** for large datasets
+
+### Support
+
+For issues and questions:
+1. **Check logs**: Backend console output and browser console
+2. **Review API responses**: Use browser DevTools Network tab
+3. **Test individual services**: Use health check endpoints
+4. **Verify configuration**: Double-check environment variables
+
+### Contributing
+
+1. **Fork the repository**
+2. **Create feature branch**: `git checkout -b feature/amazing-feature`
+3. **Make changes** with proper TypeScript types and tests
+4. **Update documentation** as needed
+5. **Submit pull request** with detailed description
+
+---
+
+**Built with ❤️ using Grok AI and modern TypeScript**
