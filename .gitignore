@@ -1,3 +1,22 @@
+# Node / Monorepo
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-lock.yaml
+# Next.js
+.next/
+out/
+# Build artifacts
+dist/
+build/
+coverage/
+# Env & OS
+.env
+.env.*
+.DS_Store
+
 # Dependencies
 node_modules/
 npm-debug.log*
@@ -295,3 +314,112 @@ test-results.xml
 # Local development
 .local/
 .localhost/
+
+# Additional items to prevent repository bloat
+# Large media files
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.wmv
+*.flv
+*.webm
+*.m4v
+*.3gp
+*.mp3
+*.wav
+*.flac
+*.aac
+*.ogg
+*.wma
+*.m4a
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.tiff
+*.svg
+*.ico
+*.psd
+*.ai
+*.eps
+*.pdf
+
+# Archive files
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+*.bz2
+*.xz
+
+# OS generated files
+.DS_Store?
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Environment files
+.env*
+!.env.example
+
+# Database files
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+
+# Log files
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime files
+.pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage reports
+coverage/
+.nyc_output/
+*.lcov
+
+# Build artifacts
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+
+# Cache directories
+.cache/
+.parcel-cache/
+.npm/
+.eslintcache/
+.stylelintcache/
+
+# Temporary directories
+tmp/
+temp/
+.tmp/
+.temp/
