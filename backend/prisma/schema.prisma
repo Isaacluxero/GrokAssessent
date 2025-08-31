@@ -1,0 +1,140 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id           String   @id @default(cuid())
+  name         String
+  domain       String?  @unique
+  size         Int?
+  industry     String?
+  leads        Lead[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("companies")
+}
+
+model Lead {
+  id             String   @id @default(cuid())
+  companyId      String?
+  company        Company? @relation(fields: [companyId], references: [id])
+  fullName       String
+  title          String?
+  email          String?  @unique
+  linkedinUrl    String?
+  websiteUrl     String?
+  source         String?  // inbound, outbound, upload
+  score          Int      @default(0)
+  scoreBreakdown Json?
+  stage          PipelineStage @default(NEW)
+  notes          String?
+  interactions   Interaction[]
+  messages       Message[]
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("leads")
+}
+
+enum PipelineStage {
+  NEW
+  QUALIFIED
+  OUTREACH
+  REPLIED
+  MEETING_SCHEDULED
+  WON
+  LOST
+}
+
+model Interaction {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id])
+  type      String   // view, email_sent, reply, call, meeting
+  payload   Json?
+  createdAt DateTime @default(now())
+
+  @@map("interactions")
+}
+
+model MessageTemplate {
+  id        String   @id @default(cuid())
+  name      String
+  body      String   // handlebars/variables: {{firstName}}, {{painPoint}}, {{valueProp}}
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("message_templates")
+}
+
+model ScoringProfile {
+  id        String   @id @default(cuid())
+  name      String
+  weights   Json     // {industryFit: 0.3, size: 0.2, techStack: 0.5}
+  rules     Json?    // {mustHave: ["domain", "title includes 'VP'"]}
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("scoring_profiles")
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  leadId     String
+  lead       Lead     @relation(fields: [leadId], references: [id])
+  direction  String   // outbound, inbound
+  channel    String   // email, linkedin
+  subject    String?
+  body       String
+  status     String   // draft, sent, failed
+  meta       Json?
+  createdAt  DateTime @default(now())
+
+  @@map("messages")
+}
+
+model EvalCase {
+  id             String   @id @default(cuid())
+  name           String
+  description    String
+  category       String   // scoring, outreach, qualification, general
+  input          Json     // {lead, template, scoringProfile, etc}
+  expectedOutput Json     // structured expectations
+  criteria       Json     // array of validation criteria
+  metadata       Json?    // additional metadata
+  runs           EvalRun[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("eval_cases")
+}
+
+model EvalRun {
+  id           String   @id @default(cuid())
+  caseId       String
+  case         EvalCase @relation(fields: [caseId], references: [id])
+  caseName     String
+  input        Json     // input used for the test
+  expectedOutput Json   // expected output
+  actualOutput Json     // actual AI output
+  scores       Json     // array of criteria scores
+  overallScore Float
+  passed       Boolean
+  duration     Int      // milliseconds
+  modelUsed    String
+  promptUsed   String
+  metadata     Json?    // additional metadata
+  createdAt    DateTime @default(now())
+
+  @@map("eval_runs")
+}
