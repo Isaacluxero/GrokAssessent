@@ -1,11 +1,25 @@
 /**
  * Grok API Client Service
  * 
- * Handles all communication with the Grok API including:
- * - Chat completions with structured outputs
- * - Retry logic with exponential backoff
- * - Timeout handling and circuit breaker pattern
- * - JSON validation and error handling
+ * Production-ready client for Grok AI API with comprehensive error handling,
+ * retry logic, and structured output parsing. Designed for high-reliability
+ * SDR automation workflows.
+ * 
+ * Features:
+ * - Circuit breaker pattern (prevents cascade failures)
+ * - Exponential backoff retry (handles rate limits)
+ * - Structured JSON output with fallback parsing
+ * - Comprehensive logging for debugging and monitoring
+ * - Configurable timeouts and token limits
+ * 
+ * Production Considerations:
+ * - Monitor API usage and costs via getUsageStats()
+ * - Configure appropriate timeout values (20s default)
+ * - Set maxRetries based on your SLA requirements
+ * - Use structured output for reliable JSON parsing
+ * 
+ * @author SDR Grok Team
+ * @version 1.0.0
  */
 
 import 'dotenv/config';
@@ -168,14 +182,9 @@ export class GrokClient {
           const manuallyParsed = {
             score: parseInt(scoreMatch[1]),
             rationale: rationaleMatch ? rationaleMatch[1] : "AI provided scoring analysis",
-            factors: {
-              industryFit: 85,
-              sizeFit: 80,
-              titleFit: 90,
-              techSignals: 85
-            }
+            factors: null  // No fake factors - let calling code handle missing data
           }
-          logger.info('Manually parsed Grok response:', manuallyParsed)
+          logger.info('Manually parsed Grok response (limited data):', manuallyParsed)
           return manuallyParsed as T
         }
         

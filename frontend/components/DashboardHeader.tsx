@@ -58,16 +58,9 @@ export function DashboardHeader() {
             </nav>
           </div>
 
-          {/* Quick Actions */}
+          {/* Quick Actions - Removed for simplified interface */}
           <div className="flex items-center space-x-3">
-            <Button variant="outline" size="sm">
-              <Plus className="w-4 h-4 mr-2" />
-              New Lead
-            </Button>
-            <Button size="sm">
-              <Play className="w-4 h-4 mr-2" />
-              Run Evals
-            </Button>
+            {/* Actions removed per user request */}
           </div>
         </div>
       </div>

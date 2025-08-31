@@ -121,7 +121,7 @@ export function LeadTable() {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredLeads.map((lead) => (
-              <tr key={lead.id} className="hover:bg-gray-50">
+              <tr key={lead.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => window.location.href = `/leads/${lead.id}`}>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     <div className="flex-shrink-0 h-10 w-10">
@@ -171,7 +171,7 @@ export function LeadTable() {
                   {formatDate(lead.createdAt)}
                 </td>
                 
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" onClick={(e) => e.stopPropagation()}>
                   <div className="flex items-center justify-end space-x-2">
                     <Link href={`/leads/${lead.id}`}>
                       <Button variant="ghost" size="sm">

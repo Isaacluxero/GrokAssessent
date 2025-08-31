@@ -6,8 +6,6 @@
  * - Lead search and filtering
  * - Company management
  * 
- * @author SDR Grok Team
- * @version 1.0.0
  */
 
 import { Router } from 'express'

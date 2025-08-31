@@ -69,3 +69,110 @@ GROK_BASE_URL=https://api.x.ai/v1
 HOST=http://localhost:3000
 PORT=8080
 ```
+
+## Deployment Considerations
+
+### Production Environment Setup
+
+#### Required Environment Variables
+```bash
+# Core Configuration
+NODE_ENV=production
+PORT=8080
+FRONTEND_URL=https://your-domain.com
+
+# Database Configuration (Use managed PostgreSQL)
+DATABASE_URL=postgresql://username:password@host:5432/sdr_grok_prod
+DATABASE_POOL_SIZE=20
+DATABASE_CONNECTION_TIMEOUT=30000
+
+# Grok AI Configuration
+GROK_API_KEY=your_production_grok_api_key
+GROK_MODEL=grok-4-0709
+GROK_BASE_URL=https://api.x.ai/v1
+GROK_TIMEOUT=30000
+GROK_MAX_RETRIES=2
+
+# Security Configuration
+CORS_ORIGINS=https://your-domain.com
+RATE_LIMIT_WINDOW=900000  # 15 minutes
+RATE_LIMIT_MAX=100        # requests per window
+
+# Monitoring & Logging
+LOG_LEVEL=info
+SENTRY_DSN=your_sentry_dsn_for_error_tracking
+```
+
+#### Database Deployment
+1. **Use managed PostgreSQL** (AWS RDS, Google Cloud SQL, Azure Database)
+2. **Configure SSL connections** for security
+3. **Set up automated backups** (daily + point-in-time recovery)
+4. **Configure connection pooling** (10-20 connections recommended)
+5. **Run migrations**: `npx prisma migrate deploy`
+6. **Seed initial data**: `npm run db:seed`
+
+#### Application Deployment
+
+**Option 1: Cloud Platforms (Recommended)**
+```bash
+# Frontend: Vercel
+vercel --prod
+
+# Backend: Railway, Render, or AWS App Runner
+railway login && railway up
+```
+
+**Option 2: Container Deployment**
+```bash
+# Build production images
+docker build -t sdr-grok-backend ./backend
+docker build -t sdr-grok-frontend ./frontend
+
+# Deploy with orchestration (Kubernetes, ECS, etc.)
+kubectl apply -f k8s/
+```
+
+#### Performance & Scaling
+- **Frontend**: Use CDN (CloudFront, Cloudflare) for static assets
+- **Backend**: Configure horizontal scaling with load balancer
+- **Database**: Use read replicas for high-traffic scenarios
+- **Caching**: Implement Redis for session storage and API caching
+- **Monitoring**: Set up APM (DataDog, New Relic) and error tracking (Sentry)
+
+#### Security Checklist
+- [ ] Configure HTTPS with SSL certificates
+- [ ] Set up CORS for production domains only
+- [ ] Enable rate limiting (100 req/15min recommended)
+- [ ] Configure security headers (helmet.js)
+- [ ] Use environment variables for all secrets
+- [ ] Set up VPC with private subnets (if using AWS/GCP)
+- [ ] Configure firewall rules and security groups
+- [ ] Regular security updates and dependency scanning
+
+#### Monitoring & Health Checks
+```bash
+# Application health endpoints
+GET /health                    # Overall application health
+GET /api/leads/health/status   # Lead service health
+GET /api/scoring/health/status # Scoring service health
+GET /api/evals/health/status   # Evaluation service health
+
+# Key metrics to monitor
+- API response times (<2s for scoring, <500ms for CRUD)
+- Grok API success rate (>95%)
+- Database connection pool usage
+- Memory and CPU utilization
+- Error rates by endpoint
+```
+
+#### Backup & Recovery
+- **Database**: Automated daily backups with 30-day retention
+- **Application**: Code in version control with deployment artifacts
+- **Configurations**: Environment variables in secure storage
+- **Disaster Recovery**: RTO <4 hours, RPO <1 hour
+
+#### Cost Optimization
+- **Grok API**: Monitor token usage and implement caching
+- **Database**: Right-size instances based on actual usage
+- **Compute**: Use auto-scaling to match demand
+- **Storage**: Implement log rotation and data archival policies

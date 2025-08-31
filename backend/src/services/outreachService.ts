@@ -393,11 +393,8 @@ Return STRICT JSON:
         duration: `${duration}ms`
       })
       
-      // Return fallback message
-      return {
-        subject: 'Follow up',
-        body: `Hi ${lead.fullName},\n\nI wanted to follow up on our previous conversation. Would you be interested in a quick call to discuss how we can help ${lead.company?.name || 'your company'}?\n\nBest regards`
-      }
+      // Throw error instead of returning fake message
+      throw new Error(`Failed to generate AI message: ${error.message}`)
     }
   }
 

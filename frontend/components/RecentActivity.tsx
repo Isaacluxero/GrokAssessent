@@ -62,10 +62,21 @@ const ActivityItem = ({
 }
 
 export function RecentActivity() {
-  const { data: leads, isLoading, error } = useLeads()
+  try {
+    const { data: leads, isLoading, error } = useLeads()
 
-  // Ensure leads is always an array and handle errors
-  const safeLeads = Array.isArray(leads) ? leads : []
+    // Ensure leads is always an array and handle errors
+    const safeLeads = Array.isArray(leads) ? leads : []
+
+    if (error) {
+      console.error('RecentActivity API error:', error)
+      return (
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+          <p className="text-red-600">Error loading activity data. Check console for details.</p>
+        </div>
+      )
+    }
 
   if (isLoading) {
     return (
@@ -112,4 +123,13 @@ export function RecentActivity() {
       </div>
     </div>
   )
+  } catch (error) {
+    console.error('RecentActivity component error:', error)
+    return (
+      <div className="bg-white rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+        <p className="text-red-600">Component error. Check console for details.</p>
+      </div>
+    )
+  }
 }

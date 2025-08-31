@@ -316,17 +316,8 @@ Return JSON only:
         duration: `${duration}ms`
       })
       
-      // Return fallback score
-      return {
-        score: 50,
-        factors: {
-          industryFit: 50,
-          sizeFit: 50,
-          titleFit: 50,
-          techSignals: 50
-        },
-        rationale: 'Fallback score due to AI scoring failure'
-      }
+      // Throw error instead of returning fake data
+      throw new Error(`AI scoring failed: ${error.message}`)
     }
   }
 

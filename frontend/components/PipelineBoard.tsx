@@ -22,7 +22,10 @@ const stageConfig = {
 }
 
 const LeadCard = ({ lead }: { lead: any }) => (
-  <div className="bg-white rounded-lg shadow-sm border p-4 mb-3 hover:shadow-md transition-shadow cursor-pointer">
+  <div 
+    className="bg-white rounded-lg shadow-sm border p-4 mb-3 hover:shadow-md transition-shadow cursor-pointer"
+    onClick={() => window.location.href = `/leads/${lead.id}`}
+  >
     <div className="flex items-start justify-between mb-2">
       <h4 className="font-medium text-gray-900">{lead.fullName}</h4>
       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStageColor(lead.stage)}`}>
@@ -46,10 +49,21 @@ const LeadCard = ({ lead }: { lead: any }) => (
 )
 
 export function PipelineBoard() {
-  const { data: leads, isLoading, error } = useLeads()
+  try {
+    const { data: leads, isLoading, error } = useLeads()
 
-  // Ensure leads is always an array and handle errors
-  const safeLeads = Array.isArray(leads) ? leads : []
+    // Ensure leads is always an array and handle errors
+    const safeLeads = Array.isArray(leads) ? leads : []
+
+    if (error) {
+      console.error('PipelineBoard API error:', error)
+      return (
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Pipeline Overview</h3>
+          <p className="text-red-600">Error loading pipeline data. Check console for details.</p>
+        </div>
+      )
+    }
 
   if (isLoading) {
     return (
@@ -117,5 +131,14 @@ export function PipelineBoard() {
         })}
       </div>
     </div>
-  )
+  ) 
+  } catch (error) {
+    console.error('PipelineBoard component error:', error)
+    return (
+      <div className="bg-white rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Pipeline Overview</h3>
+        <p className="text-red-600">Component error. Check console for details.</p>
+      </div>
+    )
+  }
 }

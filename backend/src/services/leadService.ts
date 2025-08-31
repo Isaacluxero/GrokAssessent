@@ -51,8 +51,11 @@ export class LeadService {
       if (data.company) {
         logger.debug('Creating or finding company', { companyName: data.company.name })
         
+        // Generate a domain from company name if not provided
+        const domain = data.company.domain || `${data.company.name.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`
+        
         const company = await this.prisma.company.upsert({
-          where: { domain: data.company.domain || undefined },
+          where: { domain },
           update: { 
             name: data.company.name,
             size: data.company.size,
@@ -60,14 +63,14 @@ export class LeadService {
           },
           create: {
             name: data.company.name,
-            domain: data.company.domain,
+            domain,
             size: data.company.size,
             industry: data.company.industry
           }
         })
         
         companyId = company.id
-        logger.debug('Company processed', { companyId, companyName: company.name })
+        logger.debug('Company processed', { companyId, companyName: company.name, domain })
       } else if (data.companyId) {
         companyId = data.companyId
         logger.debug('Using existing company', { companyId })
